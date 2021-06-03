@@ -1,0 +1,78 @@
+.crypto {
+  padding: 32px;
+  width: 100%;
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      column-gap: 32px;
+      row-gap: 32px;
+
+      @media screen and (max-width: 1190px){
+        grid-template-columns: repeat(2, 1fr);
+      }
+      @media screen and (max-width: 576px){
+        grid-template-columns: 1fr;
+      }
+
+      .box {
+        box-shadow: $box-shadow;
+        background-color: white;
+        border-radius: 10px;
+        overflow: hidden;
+
+        .info {
+          padding: 16px 16px 0;
+
+          .top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            .title {
+              display: flex;
+              align-items: center;
+
+              span:nth-child(1) {
+                font-size: 20px;
+                color: #262626;
+                font-weight: 700;
+              }
+
+              span:nth-child(2) {
+                margin-left: 10px;
+              }
+              .green{
+                color: #52c41a;
+              }
+              .red{
+                color: #f5222d;
+                svg{
+                  transform: rotateX(180deg);
+                }
+              }
+            }
+            .coin {
+              color: #6da7e1;
+              font-size: 25px;
+            }
+
+          }
+
+          .name {
+            color: #8c8c8c;
+            font-size: 12px;
+            margin-top: 10px;
+          }
+        }
+
+        .chart{
+          transform: scale(1.05) translateY(3px);
+        }
+      }
+      .box:last-child{
+        .chart{
+          transform: translateY(3px);
+        }
+      }
+    }
+  }

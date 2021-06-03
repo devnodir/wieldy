@@ -1,0 +1,20 @@
+@import "../../Components/style/sidebar";
+@import "../../Components/style/navbar";
+@import "crypto";
+
+.home{
+  height: 100vh;
+  width: 100%;
+  display: flex;
+
+  .main{
+    width: 100%;
+    height: 100%;
+    background-color: $bg;
+
+    .page{
+      height: calc(100vh - 72px);
+      overflow: auto;
+    }
+  }
+}
