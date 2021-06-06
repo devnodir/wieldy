@@ -23,12 +23,14 @@ const App = ({isAuth, setIsAuth,tokenStatus,getTokenCheck}) => {
                     setIsAuth(true)
                     history.push('/main/dashboard/crypto')
                 }
+                console.log('11')
             }).catch(err=>{
                 history.push('/sign-in')
                 console.log('11')
             })
         }else {
             history.push('/sign-in')
+            console.log('11')
         }
     })
 

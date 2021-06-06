@@ -11,7 +11,7 @@ const FormValidation = ({setIsAuth,status}) => {
             <div className={'main'}>
                 <div className="container">
                     <div className="left">
-                        <div className="bg">
+                        <div className="bg-form">
                             <div className="top">
                                 <h1 className="title">Sign In</h1>
                                 <p className="text">By Signing Up, you can avail full features of our services.</p>

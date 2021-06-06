@@ -53,4 +53,4 @@ export const postCreateUser = (data) => apiAction({
 
 
 export default root.reducer
-export const {setIsAuth,getDataLogin,getTokenStatus} = root.actions
+export const {setIsAuth,getDataLogin,getTokenStatus, createUser} = root.actions

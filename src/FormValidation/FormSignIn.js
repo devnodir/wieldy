@@ -1,15 +1,14 @@
 import React, {useEffect, useState} from 'react';
 import {motion} from "framer-motion";
 import AlertForm from "./AlertForm";
-import {FaFacebook, FaGithub, FaGoogle, FaTwitter} from "react-icons/all";
+import {FaFacebook, FaGithub, FaGoogle, FaTwitter,FaTimesCircle} from "react-icons/all";
 import {Link, useHistory} from 'react-router-dom'
-import {FaTimesCircle} from "react-icons/all";
 import {Beetle as Button} from 'react-button-loaders'
 import {postLogin} from "../Redux/Reducer";
 import {connect} from "react-redux";
 
 
-const FormSignIn = ({setIsAuth, setIsSignIs, postLogin, loginStatus, isAuth}) => {
+const FormSignIn = ({setIsAuth, postLogin, loginStatus}) => {
 
     const [errorEmail, setErrorEmail] = useState(false)
     const [errorPassword, setErrorPassword] = useState(false)
@@ -37,7 +36,6 @@ const FormSignIn = ({setIsAuth, setIsSignIs, postLogin, loginStatus, isAuth}) =>
             return
         }
 
-        // Loginni database dan tekshirish
         postLogin({
             email: emailValue,
             password: passwordValue
@@ -48,14 +46,26 @@ const FormSignIn = ({setIsAuth, setIsSignIs, postLogin, loginStatus, isAuth}) =>
     useEffect(() => {
         if (loginStatus) {
             if (loginStatus.ok){
-                setIsAuth(true)
-                history.push('/main/dashboard/crypto')
-                localStorage.setItem('userToken', loginStatus.token)
-            }else {
+                setLoading('finished')
+                setTimeout(()=>{
+                    setIsAuth(true)
+                    history.push('/main/dashboard/crypto')
+                    localStorage.setItem('userToken', loginStatus.token)
+                },200)
+            }else if(loginStatus.response.data.message==='Error: Password is incorrect') {
                 setLoading('')
+                setAlertText(loginStatus.response.data.message)
+                setAlert(true)
+                setErrorPassword(true)
+            }else if(loginStatus.response.data.message==='Error: Email is invalid') {
+                setLoading('')
+                setAlertText(loginStatus.response.data.message)
+                setAlert(true)
+                setErrorEmail(true)
+                console.log(loginStatus.response)
             }
         }
-    }, [loginStatus])
+    }, [loginStatus,setIsAuth,history])
 
     const errorFunc = (e, name) => {
         let value = e.target.value
@@ -127,10 +137,10 @@ const FormSignIn = ({setIsAuth, setIsSignIs, postLogin, loginStatus, isAuth}) =>
             </div>
             <div className="content">
                 <p className="footr">
-                    demo user email: 'nodir@example.com' and password: 'nodir#123'
+                    demo user email: 'nodir@mail.ru' and password: 'Dexpix45'
                 </p>
             </div>
-            <AlertForm text={alertText} alert={alert} setAlert={setAlert} icon={FaTimesCircle} color={'#f5222d'}/>
+            <AlertForm text={alertText} alert={alert} setAlert={setAlert} icon={FaTimesCircle}/>
         </form>
     );
 };

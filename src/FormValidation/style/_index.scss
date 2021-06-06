@@ -44,9 +44,11 @@
 
         @media screen and (max-width: 576px){
           width: 100%;
+          background-repeat: no-repeat;
+          background-size: cover;
         }
 
-        .bg {
+        .bg-form {
           background-color: #038fdeb3;
           padding: 35px 35px 20px;
           height: 100%;

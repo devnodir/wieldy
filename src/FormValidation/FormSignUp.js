@@ -3,27 +3,41 @@ import {motion} from "framer-motion";
 import AlertForm from "./AlertForm";
 import {FaFacebook, FaGithub, FaGoogle, FaTwitter} from "react-icons/all";
 import {Link} from 'react-router-dom'
-import {FaCheckCircle} from 'react-icons/all'
 import {useHistory} from 'react-router-dom'
-import {postCreateUser} from "../Redux/Reducer";
+import {postCreateUser, createUser} from "../Redux/Reducer";
 import {connect} from "react-redux";
 import {Beetle as Button} from 'react-button-loaders'
 
-const FormSignIn = ({postCreateUser, newUser}) => {
+const FormSignIn = ({postCreateUser, newUser, createUser}) => {
 
     const [errorEmail, setErrorEmail] = useState(false)
     const [errorPassword, setErrorPassword] = useState(false)
     const [errorUser, setErrorUser] = useState(false)
     const [alert, setAlert] = useState(false)
     const [alertText, setAlertText] = useState('')
+    const [statusAlert, setStatusAlert] = useState(null)
     const [loading, setLoading] = useState('')
     const history = useHistory()
 
     useEffect(() => {
         if (newUser) {
-            console.log(newUser)
+            if(newUser.ok){
+                setStatusAlert(true)
+                setAlertText('Successfully')
+                setAlert(true)
+                setLoading('finished')
+                setTimeout(() => {
+                    history.push('/sign-in')
+                }, 500)
+            }else{
+                setStatusAlert(false)
+                setAlertText(newUser.message)
+                setAlert(true)
+                setLoading('')
+            }
         }
-    }, [newUser])
+        createUser(null)
+    }, [newUser,createUser,history])
 
     const formSubmit = (e) => {
         e.preventDefault()
@@ -31,13 +45,13 @@ const FormSignIn = ({postCreateUser, newUser}) => {
         const emailValue = e.target.children[1].children[0].value
         const passwordValue = e.target.children[2].children[0].value
 
-        if(!userValue || !/^[a-zA-Z]*$/.test(userValue) || !userValue.includes('')){
+        if (!userValue || !/^[a-zA-Z]*$/.test(userValue) || userValue.length < 5) {
             setErrorUser(true)
             return;
-        }else if(!emailValue){
+        } else if (!emailValue || !emailValue.includes('@') || !emailValue.includes('.')) {
             setErrorEmail(true)
             return;
-        }else if(!passwordValue){
+        } else if (!passwordValue || passwordValue.length < 6) {
             setErrorPassword(true)
             return;
         }
@@ -142,9 +156,9 @@ const FormSignIn = ({postCreateUser, newUser}) => {
                     </div>
                 </div>
             </div>
-            <AlertForm text={alertText} alert={alert} setAlert={setAlert} icon={FaCheckCircle} color={'green'}/>
+            <AlertForm text={alertText} alert={alert} setAlert={setAlert} status={statusAlert}/>
         </form>
     );
 };
 
-export default connect(({Reducer: {newUser}}) => ({newUser}), {postCreateUser})(FormSignIn);
+export default connect(({Reducer: {newUser}}) => ({newUser}), {postCreateUser, createUser})(FormSignIn);
