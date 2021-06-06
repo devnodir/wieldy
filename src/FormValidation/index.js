@@ -26,7 +26,7 @@ const FormValidation = ({setIsAuth,status}) => {
                         {
                             status==='in'?
                                 <FormSignIn setIsAuth={setIsAuth}/>
-                                :<FormSignUp/>
+                                :<FormSignUp setIsAuth={setIsAuth}/>
                         }
                     </div>
                 </div>

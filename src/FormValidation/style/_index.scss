@@ -156,11 +156,20 @@
                 background-color: $primary;
                 border: none;
                 outline: none;
-                padding: 0 15px;
+                padding: 0 50px;
                 color: white;
                 height: 36px;
                 border-radius: 5px;
                 cursor: pointer;
+                text-transform: capitalize;
+                width: fit-content;
+                box-shadow: unset;
+                transform: unset;
+                transition: all .3s;
+
+                &.loading{
+                  background-color: rgba(3, 143, 222, 0.7);
+                }
               }
 
               p{

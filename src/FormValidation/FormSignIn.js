@@ -1,17 +1,21 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {motion} from "framer-motion";
 import AlertForm from "./AlertForm";
 import {FaFacebook, FaGithub, FaGoogle, FaTwitter} from "react-icons/all";
 import {Link, useHistory} from 'react-router-dom'
 import {FaTimesCircle} from "react-icons/all";
+import {Beetle as Button} from 'react-button-loaders'
+import {postLogin} from "../Redux/Reducer";
+import {connect} from "react-redux";
 
 
-const FormSignIn = ({setIsAuth, setIsSignIs}) => {
+const FormSignIn = ({setIsAuth, setIsSignIs, postLogin, loginStatus, isAuth}) => {
 
     const [errorEmail, setErrorEmail] = useState(false)
     const [errorPassword, setErrorPassword] = useState(false)
     const [alert, setAlert] = useState(false)
     const [alertText, setAlertText] = useState('Hello')
+    const [loading, setLoading] = useState('')
     const history = useHistory()
 
 
@@ -28,26 +32,30 @@ const FormSignIn = ({setIsAuth, setIsSignIs}) => {
             setAlertText('Password length is less than 6')
             setAlert(true)
             setErrorPassword(true)
+            console.log('hello')
+
+            return
         }
 
-        if (passwordValue === 'nodir#123' && emailValue === 'nodir@example.com') {
-            setIsAuth(true)
-            history.push('/main/dashboard/crypto')
-        } else if (passwordValue !== 'nodir#123' && emailValue === 'nodir@example.com') {
-            setAlertText('The password is invalid or the user does not have a password.')
-            setAlert(true)
-            setErrorPassword(true)
-        } else if (passwordValue === 'nodir#123' && emailValue !== 'nodir@example.com') {
-            setAlertText('The email is invalid or the user does not have a email.')
-            setAlert(true)
-            setErrorEmail(true)
-        } else if (passwordValue !== 'nodir#123' && emailValue !== 'nodir@example.com') {
-            setAlertText('Email and password are invalid or the user does not have email and password.')
-            setAlert(true)
-            setErrorEmail(true)
-            setErrorPassword(true)
-        }
+        // Loginni database dan tekshirish
+        postLogin({
+            email: emailValue,
+            password: passwordValue
+        })
+        setLoading('loading')
     }
+
+    useEffect(() => {
+        if (loginStatus) {
+            if (loginStatus.ok){
+                setIsAuth(true)
+                history.push('/main/dashboard/crypto')
+                localStorage.setItem('userToken', loginStatus.token)
+            }else {
+                setLoading('')
+            }
+        }
+    }, [loginStatus])
 
     const errorFunc = (e, name) => {
         let value = e.target.value
@@ -70,7 +78,7 @@ const FormSignIn = ({setIsAuth, setIsSignIs}) => {
         <form className={'form'} id={'my-form'} onSubmit={formSubmit}>
             <div className="content">
                 <input className={`input ${errorEmail ? 'red' : null}`} name={'email'} type="text"
-                       placeholder={'Email'} defaultValue={'nodir@example.com'}
+                       placeholder={'Email'} defaultValue={'nodir@mail.ru'}
                        form={'my-form'} autoComplete={'off'}
                        onBlur={(e) => errorFunc(e, 'email')}
                        onChange={(e) => errorFunc(e, 'email')}/>
@@ -83,7 +91,7 @@ const FormSignIn = ({setIsAuth, setIsSignIs}) => {
             </div>
             <div className="content">
                 <input className={`input ${errorPassword ? 'red' : null}`} name={'password'} type="password"
-                       placeholder={'Password'} defaultValue={'nodir#123'}
+                       placeholder={'Password'} defaultValue={'Dexpix45'}
                        form={'my-form'} autoComplete={'off'}
                        onBlur={(e) => errorFunc(e, 'password')}
                        onChange={(e) => errorFunc(e, 'password')}/>
@@ -101,7 +109,8 @@ const FormSignIn = ({setIsAuth, setIsSignIs}) => {
             </div>
             <div className="content">
                 <div className="link">
-                    <button className={'btn-submit'} form={'my-form'}>Sign In</button>
+                    <Button className={`btn-submit ${loading === 'loading' ? 'loading' : ''}`}
+                            state={loading} form={'my-form'}>Sign In</Button>
                     <p>or <Link to={'/sign-up'} className={'span'}>Sing Up</Link></p>
                 </div>
             </div>
@@ -126,4 +135,4 @@ const FormSignIn = ({setIsAuth, setIsSignIs}) => {
     );
 };
 
-export default FormSignIn;
+export default connect(({Reducer: {loginStatus, isAuth}}) => ({loginStatus, isAuth}), {postLogin})(FormSignIn);

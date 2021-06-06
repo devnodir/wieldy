@@ -1,46 +1,68 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {motion} from "framer-motion";
 import AlertForm from "./AlertForm";
 import {FaFacebook, FaGithub, FaGoogle, FaTwitter} from "react-icons/all";
 import {Link} from 'react-router-dom'
 import {FaCheckCircle} from 'react-icons/all'
 import {useHistory} from 'react-router-dom'
+import {postCreateUser} from "../Redux/Reducer";
+import {connect} from "react-redux";
+import {Beetle as Button} from 'react-button-loaders'
 
-const FormSignIn = () => {
+const FormSignIn = ({postCreateUser, newUser}) => {
 
     const [errorEmail, setErrorEmail] = useState(false)
     const [errorPassword, setErrorPassword] = useState(false)
     const [errorUser, setErrorUser] = useState(false)
     const [alert, setAlert] = useState(false)
     const [alertText, setAlertText] = useState('')
+    const [loading, setLoading] = useState('')
     const history = useHistory()
+
+    useEffect(() => {
+        if (newUser) {
+            console.log(newUser)
+        }
+    }, [newUser])
 
     const formSubmit = (e) => {
         e.preventDefault()
         const userValue = e.target.children[0].children[0].value
         const emailValue = e.target.children[1].children[0].value
         const passwordValue = e.target.children[2].children[0].value
-        console.log(emailValue)
-        if (!userValue) {
+
+        if(!userValue || !/^[a-zA-Z]*$/.test(userValue) || !userValue.includes('')){
             setErrorUser(true)
-        } else if (!emailValue.includes('@')) {
+            return;
+        }else if(!emailValue){
             setErrorEmail(true)
-        } else if (passwordValue.length < 6) {
+            return;
+        }else if(!passwordValue){
             setErrorPassword(true)
-        } else {
-            setAlertText('Successfully')
-            setAlert(true)
-            e.target.reset()
-            setTimeout(()=>{
-                history.push('/sing-in')
-            },1000)
+            return;
         }
+
+
+        setLoading('loading')
+        postCreateUser({
+            fullname: userValue,
+            email: emailValue,
+            password: passwordValue
+        })
+
 
     }
 
     const errorFunc = (e, name) => {
         let value = e.target.value
-        if (name === 'email') {
+
+        if (name === 'user') {
+            if (!value) {
+                setErrorUser(true)
+            } else {
+                setErrorUser(false)
+            }
+        } else if (name === 'email') {
             if (!value) {
                 setErrorEmail(true)
             } else {
@@ -52,12 +74,6 @@ const FormSignIn = () => {
             } else {
                 setErrorPassword(false)
             }
-        } else if (name === 'user') {
-            if (!value) {
-                setErrorUser(true)
-            } else {
-                setErrorUser(false)
-            }
         }
     }
 
@@ -65,7 +81,7 @@ const FormSignIn = () => {
         <form className={'form'} id={'my-form'} onSubmit={formSubmit}>
             <div className="content">
                 <input className={`input ${errorUser ? 'red' : null}`} name={'user'} type="text"
-                       placeholder={'Username'}
+                       placeholder={'Full name'}
                        form={'my-form'} autoComplete={'off'}
                        onBlur={(e) => errorFunc(e, 'user')}
                        onChange={(e) => errorFunc(e, 'user')}/>
@@ -73,9 +89,10 @@ const FormSignIn = () => {
                     initial={{display: 'none', y: '-10px', opacity: 0}}
                     animate={errorUser ? {display: 'block', y: '0', opacity: 1} : null}
                     transition={{duration: 0.3}}
-                    className={"error"}>Please input your username!
+                    className={"error"}>Please input your Full name!
                 </motion.div>
             </div>
+
             <div className="content">
                 <input className={`input ${errorEmail ? 'red' : null}`} name={'email'} type="text"
                        placeholder={'Email'}
@@ -109,7 +126,8 @@ const FormSignIn = () => {
             </div>
             <div className="content">
                 <div className="link">
-                    <button className={'btn-submit'} form={'my-form'}>Sign Up</button>
+                    <Button className={`btn-submit ${loading === 'loading' ? 'loading' : ''}`}
+                            state={loading} form={'my-form'}>Sign Up</Button>
                     <p>or <Link to={'/sign-in'} className={'span'}>Sing In</Link></p>
                 </div>
             </div>
@@ -129,4 +147,4 @@ const FormSignIn = () => {
     );
 };
 
-export default FormSignIn;
+export default connect(({Reducer: {newUser}}) => ({newUser}), {postCreateUser})(FormSignIn);

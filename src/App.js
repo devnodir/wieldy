@@ -1,37 +1,50 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect} from 'react';
 import "./App.scss"
 import FormValidation from "./FormValidation";
-import {Switch, Route, Redirect} from 'react-router-dom'
+import {Switch, Route, useHistory} from 'react-router-dom'
 import ProtectedRoutes from "./ProtectedRoutes";
 import Index from "./Pages";
+import {connect} from "react-redux";
+import {setIsAuth,getTokenCheck} from "./Redux/Reducer";
+import axios from "axios";
 
-const App = () => {
+const App = ({isAuth, setIsAuth,tokenStatus,getTokenCheck}) => {
 
-    const [isAuth, setIsAuth] = useState(false)
+    const history = useHistory()
+
     useEffect(()=>{
-        localStorage.setItem('auth',JSON.stringify(isAuth))
-    },[isAuth])
-
-    useEffect(()=>{
-        const auth = localStorage.getItem('auth')
-        if(auth)
-            setIsAuth(JSON.parse(auth))
-    },[])
+        const token = localStorage.getItem('userToken')
+        if(token){
+            axios.get('http://143.198.173.194/main/dashboard/crypto',{
+                headers:{'Authorization': token}
+            }).then(res=>{
+                const statusToken = res.data.ok
+                if(statusToken){
+                    setIsAuth(true)
+                    history.push('/main/dashboard/crypto')
+                }
+            }).catch(err=>{
+                history.push('/sign-in')
+                console.log('11')
+            })
+        }else {
+            history.push('/sign-in')
+        }
+    })
 
     return (
         <div className={'app'}>
             <Switch>
-                <Route path={'/sign-in'} exact>
+                <ProtectedRoutes path={'/main/dashboard/crypto'} component={Index} isAuth={isAuth}/>
+                <Route path={'/sign-in'}>
                     <FormValidation setIsAuth={setIsAuth} status={'in'}/>
                 </Route>
-                <Route path={'/sign-up'} exact>
+                <Route path={'/sign-up'}>
                     <FormValidation setIsAuth={setIsAuth} status={'up'}/>
                 </Route>
-                <ProtectedRoutes path={'/main/dashboard/crypto'} component={Index} isAuth={isAuth} exact/>
-                <Redirect to={'/sign-in'}/>
             </Switch>
         </div>
     );
 };
 
-export default App;
+export default connect(({Reducer: {isAuth,tokenStatus}}) => ({isAuth,tokenStatus}), {setIsAuth,getTokenCheck})(App);

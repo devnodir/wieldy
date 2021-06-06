@@ -8,13 +8,16 @@ import {
 } from "react-icons/all";
 import logo from '../images/logo.png'
 import avatar from '../images/domnic-harris.png'
-import {NavLink} from "react-router-dom";
+import {NavLink,useHistory} from "react-router-dom";
+import {connect} from "react-redux";
+import {setIsAuth,getDataLogin} from "../Redux/Reducer";
 
-const SideBar = ({isMenuOpen,setIsMenuOpen,isSideOpen}) => {
+const SideBar = ({isMenuOpen,setIsMenuOpen,isSideOpen,setIsAuth,getDataLogin}) => {
 
 
     const [userMenu, setUserMenu] = useState(false)
     const [hiddenMenu, setHiddenMenu] = useState(false)
+    const history = useHistory()
 
     const openMenu = () => {
         setHiddenMenu(prev => !prev)
@@ -27,6 +30,13 @@ const SideBar = ({isMenuOpen,setIsMenuOpen,isSideOpen}) => {
         setHiddenMenu(false)
         if(userMenu)
         setUserMenu(false)
+    }
+
+    const logOut = () =>{
+        localStorage.clear()
+        getDataLogin(null)
+        setIsAuth(false)
+        history.push('/sign-in')
     }
 
     return (
@@ -52,7 +62,7 @@ const SideBar = ({isMenuOpen,setIsMenuOpen,isSideOpen}) => {
                             <ul className={`user-menu ${userMenu ? 'show' : ''}`}>
                                 <li className={'item'}>My Account</li>
                                 <li className={'item'}>Connections</li>
-                                <li className={'item'}>Logout</li>
+                                <li className={'item'} onClick={logOut}>Logout</li>
                             </ul>
                         </div>
 
@@ -104,4 +114,4 @@ const SideBar = ({isMenuOpen,setIsMenuOpen,isSideOpen}) => {
     );
 };
 
-export default SideBar;
+export default connect(null,{setIsAuth,getDataLogin})(SideBar);

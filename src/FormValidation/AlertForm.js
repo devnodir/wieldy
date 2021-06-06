@@ -7,7 +7,7 @@ const AlertForm = ({alert,setAlert,text,icon,color}) => {
             setTimeout(()=>{
                 setAlert(false)
             },1500)
-    },[alert])
+    },[alert,setAlert])
 
     const Icon = icon
 
